@@ -1,5 +1,7 @@
 package com.example.eji;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,11 +35,9 @@ public class HelloController implements Initializable {
     private TableColumn<Persona, Integer> edad;
 
     @FXML
-    private TextField txtNombre;
-    @FXML
-    private TextField txtApellidos;
-    @FXML
-    private TextField txtEdad;
+    private TextField txtFiltro;
+
+    private ObservableList<Persona> listaPersonas = FXCollections.observableArrayList();
 
     private Connection connection;
     private final String db_url = "jdbc:mysql://database-1.cr60ewocg533.us-east-1.rds.amazonaws.com:3306/";
@@ -54,6 +54,8 @@ public class HelloController implements Initializable {
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         apellidos.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         edad.setCellValueFactory(new PropertyValueFactory<>("edad"));
+
+        tableView.setItems(listaPersonas);
     }
 
     Connection conectarBaseDatos(String dbName) {
@@ -124,11 +126,29 @@ public class HelloController implements Initializable {
                 String nombre = rs.getString("nombre");
                 String apellidos = rs.getString("apellidos");
                 int edad = rs.getInt("edad");
-                tableView.getItems().add(new Persona(id, nombre, apellidos, edad));
+                Persona persona = new Persona(id, nombre, apellidos, edad);
+                listaPersonas.add(persona);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             mostrarAlertaError("Error de carga", "No se pudieron cargar los datos de la base de datos.");
+        }
+    }
+
+    @FXML
+    public void filtrarPorNombre() {
+        String filtro = txtFiltro.getText().toLowerCase();
+
+        if (filtro.isEmpty()) {
+            tableView.setItems(listaPersonas); // Reset to original list if filter is empty
+        } else {
+            ObservableList<Persona> listaFiltrada = FXCollections.observableArrayList();
+            for (Persona persona : listaPersonas) {
+                if (persona.getNombre().toLowerCase().contains(filtro)) {
+                    listaFiltrada.add(persona);
+                }
+            }
+            tableView.setItems(listaFiltrada); // Set filtered list
         }
     }
 
@@ -202,6 +222,7 @@ public class HelloController implements Initializable {
     }
 
     public void agregarPersonaTabla(Persona persona) {
+        listaPersonas.add(persona);
         tableView.getItems().add(persona);
     }
 
