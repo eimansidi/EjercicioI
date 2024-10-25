@@ -94,7 +94,6 @@ public class AgregarController {
                 pstmt.setInt(4, personaOriginal.getId());
                 pstmt.executeUpdate();
 
-                // Actualizar persona en la TableView
                 Persona personaModificada = new Persona(personaOriginal.getId(), nombre, apellidos, edad);
                 helloController.modificarPersonaTabla(personaOriginal, personaModificada);
                 mostrarAlertaExito("Info", "Persona modificada correctamente");
@@ -104,7 +103,6 @@ public class AgregarController {
                 return;
             }
         } else {
-            // Insertar nueva persona en la base de datos
             String sql = "INSERT INTO Persona (nombre, apellidos, edad) VALUES (?, ?, ?)";
             try (PreparedStatement pstmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, nombre);
@@ -112,13 +110,11 @@ public class AgregarController {
                 pstmt.setInt(3, edad);
                 pstmt.executeUpdate();
 
-                // Obtener el ID generado por la base de datos
                 ResultSet generatedKeys = pstmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
                     int id = generatedKeys.getInt(1);
                     Persona nuevaPersona = new Persona(id, nombre, apellidos, edad);
 
-                    // Agregar persona a la TableView
                     helloController.agregarPersonaTabla(nuevaPersona);
                     mostrarAlertaExito("Info", "Persona añadida correctamente");
                 }
@@ -129,7 +125,6 @@ public class AgregarController {
             }
         }
 
-        // Cerrar la ventana después de guardar
         Stage stage = (Stage) btnGuardar.getScene().getWindow();
         stage.close();
     }
