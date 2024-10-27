@@ -19,9 +19,25 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 
+import javax.swing.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Locale;
+
 public class HelloController implements Initializable {
 
     private ContextMenu contextMenu;
+
+    private ResourceBundle resourceBundle;
+
+    @FXML
+    private Button btnAgregar;
+
+    @FXML
+    private Button btnModificar;
+
+    @FXML
+    private Button btnEliminar;
 
     @FXML
     private TableView<Persona> tableView;
@@ -47,6 +63,16 @@ public class HelloController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        cargarIdioma("es");
+
+        btnAgregar.setText(resourceBundle.getString("agregar"));
+        btnModificar.setText(resourceBundle.getString("modificar"));
+        btnEliminar.setText(resourceBundle.getString("eliminar"));
+
+        nombre.setText(resourceBundle.getString("nombre"));
+        apellidos.setText(resourceBundle.getString("apellidos"));
+        edad.setText(resourceBundle.getString("edad"));
+
         connection = conectarBaseDatos("personas");
         if (connection != null) {
             crearTablaPersonas();
@@ -61,17 +87,15 @@ public class HelloController implements Initializable {
         contextMenu = new ContextMenu();
 
         MenuItem modificarItem = new MenuItem("Modificar");
-        modificarItem.setOnAction(event -> modificar(null)); // Llama al método modificar
+        modificarItem.setOnAction(event -> modificar(null));
         contextMenu.getItems().add(modificarItem);
 
         MenuItem eliminarItem = new MenuItem("Eliminar");
-        eliminarItem.setOnAction(event -> eliminar(null)); // Llama al método eliminar
+        eliminarItem.setOnAction(event -> eliminar(null));
         contextMenu.getItems().add(eliminarItem);
 
-        // Añadir el menú contextual a la tabla
         tableView.setContextMenu(contextMenu);
 
-        // Manejar el clic derecho en la tabla
         tableView.setOnMouseClicked(event -> {
             if (event.isPopupTrigger() || event.getButton() == MouseButton.SECONDARY) {
                 Persona personaSeleccionada = tableView.getSelectionModel().getSelectedItem();
@@ -165,7 +189,7 @@ public class HelloController implements Initializable {
         String filtro = txtFiltro.getText().toLowerCase();
 
         if (filtro.isEmpty()) {
-            tableView.setItems(listaPersonas); // Reset to original list if filter is empty
+            tableView.setItems(listaPersonas);
         } else {
             ObservableList<Persona> listaFiltrada = FXCollections.observableArrayList();
             for (Persona persona : listaPersonas) {
@@ -173,7 +197,7 @@ public class HelloController implements Initializable {
                     listaFiltrada.add(persona);
                 }
             }
-            tableView.setItems(listaFiltrada); // Set filtered list
+            tableView.setItems(listaFiltrada);
         }
     }
 
@@ -254,6 +278,11 @@ public class HelloController implements Initializable {
     public void modificarPersonaTabla(Persona personaOriginal, Persona personaModificada) {
         int indice = tableView.getItems().indexOf(personaOriginal);
         tableView.getItems().set(indice, personaModificada);
+    }
+
+    private void cargarIdioma(String idioma) {
+        Locale locale = new Locale(idioma);
+        resourceBundle = ResourceBundle.getBundle("config", locale);
     }
 
     private void mostrarAlertaExito(String titulo, String mensaje) {
