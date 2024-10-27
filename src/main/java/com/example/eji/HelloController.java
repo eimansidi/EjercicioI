@@ -7,20 +7,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 
 public class HelloController implements Initializable {
+
+    private ContextMenu contextMenu;
 
     @FXML
     private TableView<Persona> tableView;
@@ -56,6 +57,30 @@ public class HelloController implements Initializable {
         edad.setCellValueFactory(new PropertyValueFactory<>("edad"));
 
         tableView.setItems(listaPersonas);
+
+        contextMenu = new ContextMenu();
+
+        MenuItem modificarItem = new MenuItem("Modificar");
+        modificarItem.setOnAction(event -> modificar(null)); // Llama al método modificar
+        contextMenu.getItems().add(modificarItem);
+
+        MenuItem eliminarItem = new MenuItem("Eliminar");
+        eliminarItem.setOnAction(event -> eliminar(null)); // Llama al método eliminar
+        contextMenu.getItems().add(eliminarItem);
+
+        // Añadir el menú contextual a la tabla
+        tableView.setContextMenu(contextMenu);
+
+        // Manejar el clic derecho en la tabla
+        tableView.setOnMouseClicked(event -> {
+            if (event.isPopupTrigger() || event.getButton() == MouseButton.SECONDARY) {
+                Persona personaSeleccionada = tableView.getSelectionModel().getSelectedItem();
+                if (personaSeleccionada != null) {
+                    contextMenu.show(tableView, event.getScreenX(), event.getScreenY());
+                }
+            }
+        });
+
     }
 
     Connection conectarBaseDatos(String dbName) {
