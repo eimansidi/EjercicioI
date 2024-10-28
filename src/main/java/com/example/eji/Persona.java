@@ -13,7 +13,7 @@ public class Persona {
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.edad = edad;
-    }
+    } 
 
     public int getId() {
         return id;
