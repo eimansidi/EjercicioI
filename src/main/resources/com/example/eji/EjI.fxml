@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.eji.HelloController">
+<GridPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="596.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.eji.PersonasController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="300.0" prefWidth="600.0" />
     </columnConstraints>
@@ -70,8 +70,16 @@
                 <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
             </padding>
         </HBox>
-        <HBox prefHeight="100.0" prefWidth="200.0">
+        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
             <children>
+                <ImageView fitHeight="66.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../../images/contactos.jpeg" />
+                    </image>
+               <HBox.margin>
+                  <Insets right="30.0" />
+               </HBox.margin>
+                </ImageView>
                 <Label maxWidth="1.7976931348623157E308" text="Filtrar por nombre: ">
                     <HBox.margin>
                         <Insets right="10.0" />

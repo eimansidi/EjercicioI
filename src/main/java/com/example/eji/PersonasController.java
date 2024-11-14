@@ -1,5 +1,6 @@
 package com.example.eji;
 
+import com.example.eji.model.Persona;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,12 +20,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 
-import javax.swing.*;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Locale;
 
-public class HelloController implements Initializable {
+public class PersonasController implements Initializable {
 
     private ContextMenu contextMenu;
 
@@ -61,10 +59,18 @@ public class HelloController implements Initializable {
     private final String user = "admin";
     private final String password = "12345678";
 
+    /**
+     * Metodo que se ejecuta al iniciar la aplicacion, cargando el idioma, configurando las columnas
+     * de la tabla y realizando la conexion con la base de datos.
+     *
+     * @param location La URL de la ubicacion del archivo FXML.
+     * @param resources El recurso utilizado por la vista FXML.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cargarIdioma("es");
 
+        // Configura los botones y columnas con texto desde el archivo de recursos
         btnAgregar.setText(resourceBundle.getString("agregar"));
         btnModificar.setText(resourceBundle.getString("modificar"));
         btnEliminar.setText(resourceBundle.getString("eliminar"));
@@ -73,17 +79,21 @@ public class HelloController implements Initializable {
         apellidos.setText(resourceBundle.getString("apellidos"));
         edad.setText(resourceBundle.getString("edad"));
 
+        // Conexion a la base de datos y carga de los datos
         connection = conectarBaseDatos("personas");
         if (connection != null) {
             crearTablaPersonas();
             cargarDatosDesdeBaseDeDatos();
         }
+
+        // Configuracion de las columnas de la tabla
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         apellidos.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         edad.setCellValueFactory(new PropertyValueFactory<>("edad"));
 
         tableView.setItems(listaPersonas);
 
+        // Configuracion del menu contextual para las acciones de la tabla
         contextMenu = new ContextMenu();
 
         MenuItem modificarItem = new MenuItem("Modificar");
@@ -96,6 +106,7 @@ public class HelloController implements Initializable {
 
         tableView.setContextMenu(contextMenu);
 
+        // Mostrar el menu contextual al hacer clic derecho en la tabla
         tableView.setOnMouseClicked(event -> {
             if (event.isPopupTrigger() || event.getButton() == MouseButton.SECONDARY) {
                 Persona personaSeleccionada = tableView.getSelectionModel().getSelectedItem();
@@ -107,6 +118,12 @@ public class HelloController implements Initializable {
 
     }
 
+    /**
+     * Metodo para conectar con la base de datos.
+     *
+     * @param dbName El nombre de la base de datos a conectar.
+     * @return La conexion a la base de datos.
+     */
     Connection conectarBaseDatos(String dbName) {
         Connection conn = null;
         try {
@@ -123,6 +140,9 @@ public class HelloController implements Initializable {
         return conn;
     }
 
+    /**
+     * Metodo para crear la base de datos si no existe.
+     */
     private void crearBaseDatos() {
         try (Connection conn = DriverManager.getConnection(db_url, user, password);
              Statement stmt = conn.createStatement()) {
@@ -135,6 +155,9 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metodo para crear la tabla 'Persona' en la base de datos si no existe.
+     */
     private void crearTablaPersonas() {
         if (!tablaExiste("Persona")) {
             String sqlCrearTabla = "CREATE TABLE IF NOT EXISTS Persona ("
@@ -157,6 +180,12 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Verifica si una tabla existe en la base de datos.
+     *
+     * @param nombreTabla El nombre de la tabla a verificar.
+     * @return true si la tabla existe, false si no.
+     */
     private boolean tablaExiste(String nombreTabla) {
         try (ResultSet rs = connection.getMetaData().getTables(null, null, nombreTabla, null)) {
             return rs.next();
@@ -167,6 +196,9 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metodo para cargar los datos de la tabla Persona desde la base de datos.
+     */
     private void cargarDatosDesdeBaseDeDatos() {
         String sql = "SELECT * FROM Persona";
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
@@ -184,6 +216,9 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metodo para filtrar los datos de la tabla por nombre.
+     */
     @FXML
     public void filtrarPorNombre() {
         String filtro = txtFiltro.getText().toLowerCase();
@@ -201,6 +236,11 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Abre una ventana para agregar una nueva persona.
+     *
+     * @param event El evento de accion.
+     */
     @FXML
     void agregar(ActionEvent event) {
         try {
@@ -222,6 +262,11 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Abre una ventana para modificar una persona seleccionada.
+     *
+     * @param event El evento de accion.
+     */
     @FXML
     void modificar(ActionEvent event) {
         Persona personaSeleccionada = tableView.getSelectionModel().getSelectedItem();
@@ -250,6 +295,11 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Elimina una persona seleccionada de la base de datos y de la tabla.
+     *
+     * @param event El evento de accion.
+     */
     @FXML
     void eliminar(ActionEvent event) {
         Persona personaSeleccionada = tableView.getSelectionModel().getSelectedItem();
@@ -270,21 +320,43 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Agrega una persona a la tabla de la interfaz de usuario.
+     *
+     * @param persona La persona a agregar.
+     */
     public void agregarPersonaTabla(Persona persona) {
         listaPersonas.add(persona);
         tableView.getItems().add(persona);
     }
 
+    /**
+     * Modifica una persona en la tabla de la interfaz de usuario.
+     *
+     * @param personaOriginal La persona original.
+     * @param personaModificada La persona modificada.
+     */
     public void modificarPersonaTabla(Persona personaOriginal, Persona personaModificada) {
         int indice = tableView.getItems().indexOf(personaOriginal);
         tableView.getItems().set(indice, personaModificada);
     }
 
+    /**
+     * Carga el idioma de la aplicacion.
+     *
+     * @param idioma El idioma a cargar.
+     */
     private void cargarIdioma(String idioma) {
         Locale locale = new Locale(idioma);
         resourceBundle = ResourceBundle.getBundle("config", locale);
     }
 
+    /**
+     * Muestra una alerta de exito con el mensaje proporcionado.
+     *
+     * @param titulo El titulo de la alerta.
+     * @param mensaje El mensaje que se mostrara en la alerta.
+     */
     private void mostrarAlertaExito(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -293,6 +365,12 @@ public class HelloController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Muestra una alerta de error con el mensaje proporcionado.
+     *
+     * @param titulo El titulo de la alerta.
+     * @param mensaje El mensaje que se mostrara en la alerta.
+     */
     private void mostrarAlertaError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);

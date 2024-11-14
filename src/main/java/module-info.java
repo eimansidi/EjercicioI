@@ -7,4 +7,6 @@ module com.example.eji {
 
     opens com.example.eji to javafx.fxml;
     exports com.example.eji;
+    exports com.example.eji.model;
+    opens com.example.eji.model to javafx.fxml;
 }
